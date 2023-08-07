@@ -12,20 +12,25 @@ import (
 	"strings"
 )
 
-func CalcLightness(color color.Color) float64 {
+const (
+	redLightnessContribution   = 0.21
+	greenLightnessContribution = 0.72
+	blueLightnessContribution  = 0.07
+)
+
+func lightness(color color.Color) float64 {
 	r, g, b, a := color.RGBA()
-	R, G, B := float64(r)/float64(a), float64(g)/float64(a), float64(b)/float64(a)
-	const redLightnessContribution float64 = 0.21
-	const greenLightnessContribution float64 = 0.72
-	const blueLightnessContribution float64 = 0.07
-	return (redLightnessContribution * R) + (greenLightnessContribution * G) + (blueLightnessContribution * B)
+	redContribution := (redLightnessContribution * float64(r)) / float64(a)
+	greenContribution := (greenLightnessContribution * float64(g)) / float64(a)
+	blueContribution := (blueLightnessContribution * float64(b)) / float64(a)
+	return redContribution + greenContribution + blueContribution
 }
 
-func drawCircle(img image.Paletted, X0 int, Y0 int, r int, c color.Color) {
-	for x := X0 - r; x < X0+r; x++ {
-		for y := Y0 - r; y < Y0+r; y++ {
-			X := math.Pow(float64(x-X0), 2)
-			Y := math.Pow(float64(y-Y0), 2)
+func drawCircle(img image.Paletted, center image.Point, r int, c color.Color) {
+	for x := center.X - r; x < center.X+r; x++ {
+		for y := center.Y - r; y < center.Y+r; y++ {
+			X := math.Pow(float64(x-center.X), 2)
+			Y := math.Pow(float64(y-center.Y), 2)
 			R := X + Y
 			if R < float64(r) {
 				img.Set(x, y, c)
@@ -72,14 +77,14 @@ func main() {
 			count := 0.0
 			for kernel_x := -halfKernelSize; kernel_x < halfKernelSize; kernel_x += 1 {
 				for kernel_y := -halfKernelSize; kernel_y < halfKernelSize; kernel_y += 1 {
-					weight += CalcLightness(img.At(x+kernel_x, y+kernel_y))
+					weight += lightness(img.At(x+kernel_x, y+kernel_y))
 					count += 1
 				}
 			}
 			blotchScalar := 1 - weight/count
 			radius := int(float64(kernelSize) * blotchScalar)
 			if radius > 0 {
-				drawCircle(*blotchImg, x, y, radius, color.Black)
+				drawCircle(*blotchImg, image.Point{x, y}, radius, blotchImg.Palette[1])
 			}
 		}
 	}
