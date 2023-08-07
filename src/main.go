@@ -20,20 +20,19 @@ const (
 
 func lightness(color color.Color) float64 {
 	r, g, b, a := color.RGBA()
-	redContribution := (redLightnessContribution * float64(r)) / float64(a)
-	greenContribution := (greenLightnessContribution * float64(g)) / float64(a)
-	blueContribution := (blueLightnessContribution * float64(b)) / float64(a)
+	alphaRescaleFactor := float64(a)
+	redContribution := (redLightnessContribution * float64(r)) / alphaRescaleFactor
+	greenContribution := (greenLightnessContribution * float64(g)) / alphaRescaleFactor
+	blueContribution := (blueLightnessContribution * float64(b)) / alphaRescaleFactor
 	return redContribution + greenContribution + blueContribution
 }
 
-func drawCircle(img image.Paletted, center image.Point, r int, c color.Color) {
-	for x := center.X - r; x < center.X+r; x++ {
-		for y := center.Y - r; y < center.Y+r; y++ {
-			X := math.Pow(float64(x-center.X), 2)
-			Y := math.Pow(float64(y-center.Y), 2)
-			R := X + Y
-			if R < float64(r) {
-				img.Set(x, y, c)
+func drawCircle(img image.Paletted, center image.Point, radius int, fillColor color.Color) {
+	for x := center.X - radius; x < center.X+radius; x++ {
+		for y := center.Y - radius; y < center.Y+radius; y++ {
+			currentRadius := math.Pow(float64(x-center.X), 2) + math.Pow(float64(y-center.Y), 2)
+			if currentRadius < float64(radius) {
+				img.Set(x, y, fillColor)
 			}
 		}
 	}
