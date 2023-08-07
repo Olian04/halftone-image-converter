@@ -1,5 +1,5 @@
-# printing-press-image-converter
-Convert any provided image to a version that could have been printed on a printing press in an old newspaper
+# halftone-image-converter
+Convert any provided image to a version that could have been printed on a printing press in an old newspaper (aka: [halftone](https://en.wikipedia.org/wiki/Halftone))
 
 ![](./assets/demo.png)
 
